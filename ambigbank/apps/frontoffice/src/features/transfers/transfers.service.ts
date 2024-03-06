@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { Prisma, MoneyTransfer } from 'db';
 import { PrismaService } from '../../services/prisma.service';
 import { BankAccountService } from '../bank-accounts/bank-accounts.service';
@@ -27,16 +27,16 @@ export class TransfersService {
     });
 
     if (!account) {
-      throw new Error('Sender account not found');
+      throw new BadRequestException('Sender account not found');
     }
 
     if (account.userId !== userId) {
-      throw new Error('Sender account does not belong to user');
+      throw new BadRequestException('Sender account does not belong to user');
     }
 
     // Check user is not sending to themselves
     if (senderId === receiverId) {
-      throw new Error('Cannot send to yourself');
+      throw new BadRequestException('Cannot send to yourself');
     }
 
     const moneyTransfer = await this.prisma.$transaction(async (tx) => {
@@ -45,7 +45,7 @@ export class TransfersService {
       });
 
       if (sender.balance < amount) {
-        throw new Error('Insufficient funds');
+        throw new BadRequestException('Insufficient funds');
       }
 
       await tx.bankAccount.update({

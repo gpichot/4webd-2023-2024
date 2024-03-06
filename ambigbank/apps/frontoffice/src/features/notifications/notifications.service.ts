@@ -1,4 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { create } from 'apisauce';
+import { Inject, Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { User } from 'db';
 
 type EmailNotification = {
@@ -28,6 +30,9 @@ export type Notification =
 
 @Injectable()
 export class NotificationsService {
+  @Inject(ConfigService)
+  private readonly configService: ConfigService;
+
   async sendNotification(notification: Notification) {
     if (notification.type === 'all') {
       const { to } = notification;
@@ -50,14 +55,18 @@ export class NotificationsService {
       return;
     }
 
-    if (notification.type === 'email') {
-      console.log(
-        `Sending email to ${notification.to}: ${notification.subject}`,
-      );
-      return;
+    const notificationsUrl = this.configService.get(
+      'services.notifications.url',
+    );
+
+    const api = create({ baseURL: notificationsUrl });
+    const response = await api.post(notificationsUrl, { notification });
+
+    if (!response.ok) {
+      console.log('Failed to send notification', response.problem);
     }
-    if (notification.type === 'sms') {
-      console.log(`Sending SMS to ${notification.to}: ${notification.message}`);
-    }
+
+    console.log('Notification sent', response.status);
+    return;
   }
 }

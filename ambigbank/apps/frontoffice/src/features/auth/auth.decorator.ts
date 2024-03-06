@@ -5,7 +5,8 @@ export type AuthenticatedUser = {
   id: string;
 };
 
-export const AuthedUser = createParamDecorator((data, req) => {
+export const AuthedUser = createParamDecorator((data, context) => {
+  const req = context.switchToHttp().getRequest();
   const user = req.user;
 
   return {
