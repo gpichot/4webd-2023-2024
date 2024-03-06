@@ -8,17 +8,13 @@ import {
   UsePipes,
   Inject,
   ConflictException,
+  UseGuards,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { plainToClass } from 'class-transformer';
-import { createPasswordHash } from './utils';
-import { CreateUserDto, PrivateUserDto, UserDto } from './dtos';
-import {
-  ApiCreatedResponse,
-  ApiOkResponse,
-  ApiOperation,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from './auth.guard';
+import { UserDto } from './dtos';
 
 @ApiTags('users')
 @Controller('users')
@@ -30,43 +26,12 @@ export class UsersController {
   @ApiOperation({ summary: 'Get all users' })
   @Get()
   @ApiOkResponse({ type: [UserDto] })
+  @UseGuards(AuthGuard)
   async findAll() {
     const users = await this.userService.users({});
 
     return users.map((user) =>
       plainToClass(UserDto, user, { excludeExtraneousValues: true }),
     );
-  }
-
-  @ApiOperation({ summary: 'Get user by id' })
-  @Get(':id')
-  @ApiOkResponse({ type: UserDto })
-  async findOne(@Param('id') id: string) {
-    const user = await this.userService.user({ id });
-    return plainToClass(UserDto, user, { excludeExtraneousValues: true });
-  }
-
-  @ApiOperation({ summary: 'Create user' })
-  @Post()
-  @ApiCreatedResponse({ type: PrivateUserDto })
-  async create(@Body() createUserDto: CreateUserDto) {
-    const { password, ...rest } = createUserDto;
-
-    const existingUser = await this.userService.user({
-      email: createUserDto.email,
-    });
-    if (existingUser) {
-      throw new ConflictException('User already exists');
-    }
-
-    const hash = await createPasswordHash(password);
-    const user = await this.userService.createUser({
-      ...rest,
-      password: hash,
-    });
-
-    return plainToClass(PrivateUserDto, user, {
-      excludeExtraneousValues: true,
-    });
   }
 }

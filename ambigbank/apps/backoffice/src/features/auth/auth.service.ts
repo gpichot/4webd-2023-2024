@@ -29,6 +29,10 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
+    if (user.role !== 'EMPLOYEE') {
+      throw new UnauthorizedException();
+    }
+
     const payload = { email: user.email, sub: user.id };
 
     return {

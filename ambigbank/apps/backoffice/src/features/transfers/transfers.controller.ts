@@ -1,50 +1,27 @@
-import { Body, Controller, Inject, Post } from '@nestjs/common';
+import { Controller, Get, Inject, Param, UseGuards } from '@nestjs/common';
 import { TransfersService } from './transfers.service';
-import { IsDecimal, IsNotEmpty, IsPositive } from 'class-validator';
-import { Type } from 'class-transformer';
-import { Prisma } from 'db';
-import { AuthedUser, AuthenticatedUser } from '../auth/auth.decorator';
-import {
-  ApiOkResponse,
-  ApiOperation,
-  ApiProperty,
-  ApiTags,
-} from '@nestjs/swagger';
+import { plainToClass } from 'class-transformer';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '../auth/auth.guard';
+import { TransferDto } from './dtos';
 
-class CreateTransferDto {
-  @ApiProperty()
-  @IsNotEmpty()
-  accountSenderId: string;
-
-  @ApiProperty()
-  @IsNotEmpty()
-  accountReceiverId: string;
-
-  @ApiProperty({ type: Number })
-  @IsDecimal()
-  @Type(() => Prisma.Decimal)
-  @IsPositive()
-  amount: Prisma.Decimal;
-}
-
-@ApiTags('transfers')
-@Controller('transfers')
+@ApiTags('transfers', 'users')
+@Controller('users/:userId/transfers')
 export class TransfersController {
   @Inject(TransfersService)
   private readonly transfersService: TransfersService;
 
-  @ApiOperation({ summary: 'Create transfer' })
-  @Post()
-  @ApiOkResponse()
-  async createTransfer(
-    @AuthedUser() user: AuthenticatedUser,
-    @Body() body: CreateTransferDto,
-  ) {
-    return this.transfersService.createTransfer({
-      userId: user.id,
-      senderId: body.accountSenderId,
-      receiverId: body.accountReceiverId,
-      amount: body.amount,
+  @ApiOperation({ summary: 'List all users transfer' })
+  @Get()
+  @ApiOkResponse({ type: [TransferDto] })
+  @UseGuards(AuthGuard)
+  async listTransfers(@Param('userId') userId: string) {
+    const transfers = await this.transfersService.listTransfers({
+      where: { OR: [{ toAccountId: userId }, { fromAccountId: userId }] },
+    });
+
+    return plainToClass(TransferDto, transfers, {
+      excludeExtraneousValues: true,
     });
   }
 }

@@ -1,27 +1,17 @@
 import {
   Body,
   Controller,
-  Get,
   Inject,
   Post,
-  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { IsEmail, IsNotEmpty } from 'class-validator';
-import { AuthGuard } from './auth.guard';
 import express from 'express';
-import { AuthedUser, AuthenticatedUser } from './auth.decorator';
 import { UserService } from './user.service';
-import { plainToClass } from 'class-transformer';
 import { PrivateUserDto } from './dtos';
-import {
-  ApiOkResponse,
-  ApiOperation,
-  ApiTags,
-  ApiUnauthorizedResponse,
-} from '@nestjs/swagger';
+import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 export type RequestWithUser = express.Request & {
   user: { sub: string; email: string };
@@ -52,18 +42,5 @@ export class AuthController {
   async signIn(@Body() body: SignInDto) {
     const { email, password } = body;
     return this.authService.signIn(email, password);
-  }
-
-  @ApiOperation({ summary: 'Get current profile' })
-  @UseGuards(AuthGuard)
-  @Get('profile')
-  @ApiOkResponse({ type: PrivateUserDto })
-  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
-  async getProfile(@AuthedUser() user: AuthenticatedUser) {
-    const finalUser = await this.userService.user({ id: user.id });
-
-    return plainToClass(PrivateUserDto, finalUser, {
-      excludeExtraneousValues: true,
-    });
   }
 }
