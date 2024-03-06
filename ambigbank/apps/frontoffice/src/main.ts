@@ -6,7 +6,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {});
 
   const config = new DocumentBuilder()
-    .setTitle('AM BigBank API')
+    .setTitle('AM BigBank FrontOffice API')
     .setDescription('The AM BigBank API description')
     .setVersion('1.0')
     .addTag('transfers', 'Banking operations & transactions')
