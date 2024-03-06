@@ -16,6 +16,12 @@ import { AuthedUser, AuthenticatedUser } from './auth.decorator';
 import { UserService } from './user.service';
 import { plainToClass } from 'class-transformer';
 import { PrivateUserDto } from './dtos';
+import {
+  ApiOkResponse,
+  ApiOperation,
+  ApiTags,
+  ApiUnauthorizedResponse,
+} from '@nestjs/swagger';
 
 export type RequestWithUser = express.Request & {
   user: { sub: string; email: string };
@@ -30,6 +36,7 @@ class SignInDto {
   password: string;
 }
 
+@ApiTags('auth')
 @Controller('auth')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class AuthController {
@@ -39,14 +46,19 @@ export class AuthController {
   @Inject(UserService)
   private readonly userService: UserService;
 
+  @ApiOperation({ summary: 'Sign in' })
   @Post('sign-in')
+  @ApiOkResponse({ type: PrivateUserDto })
   async signIn(@Body() body: SignInDto) {
     const { email, password } = body;
     return this.authService.signIn(email, password);
   }
 
+  @ApiOperation({ summary: 'Get current profile' })
   @UseGuards(AuthGuard)
   @Get('profile')
+  @ApiOkResponse({ type: PrivateUserDto })
+  @ApiUnauthorizedResponse({ description: 'Unauthorized' })
   async getProfile(@AuthedUser() user: AuthenticatedUser) {
     const finalUser = await this.userService.user({ id: user.id });
 

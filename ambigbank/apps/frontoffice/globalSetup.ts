@@ -7,6 +7,8 @@ const logger = {
   info: console.log,
 };
 
+console.log(process.env.DATABASE_URL);
+
 export default async function startDatabase() {
   const dbUri = process.env.DATABASE_URL;
   if (!dbUri) {
@@ -40,7 +42,9 @@ export default async function startDatabase() {
   // cp.execSync(
   //   `psql -U ${dbUser} -d ${dbName} -f test/seed.sql -h ${dbHost} -p ${dbPort}`,
   // );
-  cp.execSync(`./node_modules/.bin/prisma db push --force-reset`);
+  cp.execSync(
+    `./node_modules/.bin/prisma db push --force-reset --schema ../../packages/db/prisma/schema.prisma`,
+  );
 
   return () => {
     // pass

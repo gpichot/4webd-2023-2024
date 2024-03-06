@@ -14,21 +14,26 @@ import { Type, plainToClass } from 'class-transformer';
 import { AuthGuard } from '../auth/auth.guard';
 
 import { AuthedUser, AuthenticatedUser } from '../auth/auth.decorator';
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'db';
+import { ApiOperation, ApiProperty, ApiTags } from '@nestjs/swagger';
 
 class DepositDto {
+  @ApiProperty()
   @Type(() => Prisma.Decimal)
   amount: Prisma.Decimal;
 
+  @ApiProperty()
   accountId: string;
 }
 
+@ApiTags('bank-accounts')
 @Controller('bank-accounts')
 @UsePipes(new ValidationPipe({ transform: true }))
 export class BankAccountsController {
   @Inject(BankAccountService)
   private readonly bankAccountService: BankAccountService;
 
+  @ApiOperation({ summary: 'Create bank account' })
   @Post()
   @UseGuards(AuthGuard)
   async createBankAccount(
@@ -44,6 +49,7 @@ export class BankAccountsController {
     return plainToClass(PrivateBankAccountDto, result);
   }
 
+  @ApiOperation({ summary: 'List bank accounts' })
   @Get()
   @UseGuards(AuthGuard)
   async listBankAccounts(@AuthedUser() user: AuthenticatedUser) {
@@ -56,6 +62,7 @@ export class BankAccountsController {
     );
   }
 
+  @ApiOperation({ summary: 'Deposit' })
   @Post('deposit')
   @UseGuards(AuthGuard)
   async deposit(

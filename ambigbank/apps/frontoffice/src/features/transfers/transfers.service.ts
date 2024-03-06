@@ -1,5 +1,5 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { Prisma, MoneyTransfer } from '@prisma/client';
+import { Prisma, MoneyTransfer } from 'db';
 import { PrismaService } from '../../services/prisma.service';
 import { BankAccountService } from '../bank-accounts/bank-accounts.service';
 import { NotificationsService } from '../notifications/notifications.service';

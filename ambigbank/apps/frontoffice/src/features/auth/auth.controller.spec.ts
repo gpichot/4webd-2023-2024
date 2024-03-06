@@ -4,8 +4,8 @@ import { AuthController } from './auth.controller';
 import { UserService } from './user.service';
 import { CommonModule } from '../../services/common.module';
 import { AuthModule } from '../auth/auth.module';
-import { User } from '@prisma/client';
-import { PrismaClient } from '@prisma/client';
+import { User } from 'db';
+import { prisma } from 'db';
 import { BankAccountModule } from '../bank-accounts/bank-account.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { AuthService } from './auth.service';
@@ -13,7 +13,6 @@ import { createPasswordHash } from './utils';
 
 describe('AuthController', () => {
   let authController: AuthController;
-  const prisma = new PrismaClient();
   let user: User;
 
   beforeEach(async () => {

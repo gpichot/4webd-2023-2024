@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'db';
 import { Type } from 'class-transformer';
 import { IsDecimal, IsNotEmpty, MinLength } from 'class-validator';
 

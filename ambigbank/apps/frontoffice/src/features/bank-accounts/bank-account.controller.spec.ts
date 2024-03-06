@@ -4,15 +4,13 @@ import { BankAccountsController } from './bank-accounts.controller';
 import { BankAccountService } from './bank-accounts.service';
 import { CommonModule } from 'src/services/common.module';
 import { AuthModule } from '../auth/auth.module';
-import { Prisma, User } from '@prisma/client';
-import { PrismaClient } from '@prisma/client';
+import { Prisma, User, prisma } from 'db';
 
 describe('BankAccountController', () => {
   let bankAccountController: BankAccountsController;
   let user: User;
 
   beforeEach(async () => {
-    const prisma = new PrismaClient();
     await prisma.bankAccount.deleteMany();
     await prisma.user.deleteMany();
     user = await prisma.user.create({

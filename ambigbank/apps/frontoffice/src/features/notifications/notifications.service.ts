@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User } from '@prisma/client';
+import { User } from 'db';
 
 type EmailNotification = {
   type: 'email';

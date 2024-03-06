@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-interface */
-import { Decimal } from '@prisma/client';
+import { Decimal } from 'db';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import * as vitest from 'vitest';
 interface CustomMatchers<R = unknown> {

@@ -4,8 +4,7 @@ import { TransfersController } from './transfers.controller';
 import { TransfersService } from './transfers.service';
 import { CommonModule } from 'src/services/common.module';
 import { AuthModule } from '../auth/auth.module';
-import { BankAccount, Prisma, User } from '@prisma/client';
-import { PrismaClient } from '@prisma/client';
+import { BankAccount, Prisma, User, prisma } from 'db';
 import { BankAccountModule } from '../bank-accounts/bank-account.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 
@@ -15,7 +14,6 @@ describe('TransferController', () => {
   let senderAccount: BankAccount;
   let receiver: User;
   let receiverAccount: BankAccount;
-  const prisma = new PrismaClient();
 
   beforeEach(async () => {
     await prisma.moneyTransfer.deleteMany();
