@@ -20,13 +20,13 @@ import { plainToClass } from 'class-transformer';
 import {
   ApiOkResponse,
   ApiOperation,
-  ApiProperty,
+  ApiPropertyOptional,
   ApiTags,
 } from '@nestjs/swagger';
 import { IsUUID } from 'class-validator';
 
 class SearchDto {
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsUUID()
   userId?: string;
 }

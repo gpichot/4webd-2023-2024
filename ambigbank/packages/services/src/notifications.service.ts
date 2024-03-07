@@ -1,22 +1,22 @@
-import { create } from 'apisauce';
-import { Inject, Injectable } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { create } from "apisauce";
+import { Inject, Injectable } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 
 type EmailNotification = {
-  type: 'email';
+  type: "email";
   to: string;
   subject: string;
   message: string;
 };
 
 type SMSNotification = {
-  type: 'sms';
+  type: "sms";
   to: string;
   message: string;
 };
 
 type AllNotification = {
-  type: 'all';
+  type: "all";
   to: { email?: string; phoneNumber?: string };
   title: string;
   message: string;
@@ -33,20 +33,20 @@ export class NotificationsService {
   private readonly configService: ConfigService;
 
   async sendNotification(notification: Notification) {
-    if (notification.type === 'all') {
+    if (notification.type === "all") {
       const { to } = notification;
       if (to.email) {
         this.sendNotification({
-          type: 'email',
-          to: notification.to.email,
+          type: "email",
+          to: to.email,
           subject: notification.title,
           message: notification.message,
         });
       }
       if (to.phoneNumber) {
         this.sendNotification({
-          type: 'sms',
-          to: notification.to.phoneNumber,
+          type: "sms",
+          to: to.phoneNumber,
           message: notification.message,
         });
       }
@@ -55,17 +55,17 @@ export class NotificationsService {
     }
 
     const notificationsUrl = this.configService.get(
-      'services.notifications.url',
+      "services.notifications.url",
     );
 
     const api = create({ baseURL: notificationsUrl });
     const response = await api.post(notificationsUrl, { notification });
 
     if (!response.ok) {
-      console.log('Failed to send notification', response.problem);
+      console.log("Failed to send notification", response.problem);
     }
 
-    console.log('Notification sent', response.status);
+    console.log("Notification sent", response.status);
     return;
   }
 }

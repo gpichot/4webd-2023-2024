@@ -13,7 +13,7 @@ import { AuthGuard } from '../auth/auth.guard';
 import { AuthedUser, AuthenticatedUser } from '../auth/auth.decorator';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { CreateBankAccountDto, DepositDto } from './dtos';
-import { BankAccountService } from './bank-account.service';
+import { BankAccountService } from '@ambigbank/services';
 import { PrivateBankAccountDto } from '@ambigbank/client-bank-accounts';
 
 @ApiTags('bank-accounts')

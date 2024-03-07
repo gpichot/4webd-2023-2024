@@ -208,13 +208,11 @@ export const AccountsApiAxiosParamCreator = function (configuration?: Configurat
         /**
          * 
          * @summary List bank accounts
-         * @param {string} userId 
+         * @param {string} [userId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        bankAccountsControllerListBankAccounts: async (userId: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
-            // verify required parameter 'userId' is not null or undefined
-            assertParamExists('bankAccountsControllerListBankAccounts', 'userId', userId)
+        bankAccountsControllerListBankAccounts: async (userId?: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
             const localVarPath = `/accounts`;
             // use dummy base URL string because the URL constructor only accepts absolute URLs.
             const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
@@ -294,11 +292,11 @@ export const AccountsApiFp = function(configuration?: Configuration) {
         /**
          * 
          * @summary List bank accounts
-         * @param {string} userId 
+         * @param {string} [userId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async bankAccountsControllerListBankAccounts(userId: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PrivateBankAccountDto>>> {
+        async bankAccountsControllerListBankAccounts(userId?: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<PrivateBankAccountDto>>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.bankAccountsControllerListBankAccounts(userId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['AccountsApi.bankAccountsControllerListBankAccounts']?.[localVarOperationServerIndex]?.url;
@@ -347,11 +345,11 @@ export const AccountsApiFactory = function (configuration?: Configuration, baseP
         /**
          * 
          * @summary List bank accounts
-         * @param {string} userId 
+         * @param {string} [userId] 
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        bankAccountsControllerListBankAccounts(userId: string, options?: any): AxiosPromise<Array<PrivateBankAccountDto>> {
+        bankAccountsControllerListBankAccounts(userId?: string, options?: any): AxiosPromise<Array<PrivateBankAccountDto>> {
             return localVarFp.bankAccountsControllerListBankAccounts(userId, options).then((request) => request(axios, basePath));
         },
     };
@@ -403,12 +401,12 @@ export class AccountsApi extends BaseAPI {
     /**
      * 
      * @summary List bank accounts
-     * @param {string} userId 
+     * @param {string} [userId] 
      * @param {*} [options] Override http request option.
      * @throws {RequiredError}
      * @memberof AccountsApi
      */
-    public bankAccountsControllerListBankAccounts(userId: string, options?: RawAxiosRequestConfig) {
+    public bankAccountsControllerListBankAccounts(userId?: string, options?: RawAxiosRequestConfig) {
         return AccountsApiFp(this.configuration).bankAccountsControllerListBankAccounts(userId, options).then((request) => request(this.axios, this.basePath));
     }
 }

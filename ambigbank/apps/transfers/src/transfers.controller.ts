@@ -3,35 +3,53 @@ import {
   Controller,
   Inject,
   Post,
-  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
 import { TransfersService } from './transfers.service';
 import { IsNotEmpty, IsPositive, IsUUID } from 'class-validator';
-import { AuthedUser, AuthenticatedUser } from '../auth/auth.decorator';
+import { Type, plainToClass } from 'class-transformer';
+import { Prisma } from 'db';
 import {
   ApiOkResponse,
   ApiOperation,
   ApiProperty,
   ApiTags,
 } from '@nestjs/swagger';
-import { AuthGuard } from '../auth/auth.guard';
 
 class CreateTransferDto {
   @ApiProperty()
   @IsNotEmpty()
   @IsUUID()
-  accountSenderId: string;
+  senderId: string;
 
   @ApiProperty()
   @IsNotEmpty()
   @IsUUID()
-  accountReceiverId: string;
+  receiverId: string;
 
   @ApiProperty({ type: Number })
+  @Type(() => Prisma.Decimal)
   @IsPositive()
-  amount: number;
+  amount: Prisma.Decimal;
+
+  @ApiProperty()
+  @IsUUID()
+  userId: string;
+}
+
+class TransferDto {
+  @ApiProperty()
+  id: string;
+
+  @ApiProperty()
+  senderId: string;
+
+  @ApiProperty()
+  receiverId: string;
+
+  @ApiProperty()
+  amount: Prisma.Decimal;
 }
 
 @ApiTags('transfers')
@@ -43,17 +61,12 @@ export class TransfersController {
 
   @ApiOperation({ summary: 'Create transfer' })
   @Post()
-  @ApiOkResponse()
-  @UseGuards(AuthGuard)
-  async createTransfer(
-    @AuthedUser() user: AuthenticatedUser,
-    @Body() body: CreateTransferDto,
-  ) {
-    return this.transfersService.createTransfer({
-      userId: user.id,
-      senderId: body.accountSenderId,
-      receiverId: body.accountReceiverId,
-      amount: body.amount,
-    });
+  @ApiOkResponse({ type: TransferDto })
+  async createTransfer(@Body() body: CreateTransferDto) {
+    return plainToClass(
+      TransferDto,
+      this.transfersService.createTransfer(body),
+      { excludeExtraneousValues: true },
+    );
   }
 }

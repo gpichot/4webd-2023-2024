@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { NotificationsService } from './notifications.service';
+import { NotificationsService } from '@ambigbank/services';
 import { ConfigModule } from '@nestjs/config';
 
 @Module({
