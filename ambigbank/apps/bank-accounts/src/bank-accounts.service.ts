@@ -1,7 +1,7 @@
 import { Inject, Injectable } from '@nestjs/common';
-import { PrismaService } from '../../services/prisma.service';
 
 import { BankAccount, Prisma } from 'db';
+import { PrismaService } from './services/prisma.service';
 
 @Injectable()
 export class BankAccountService {
@@ -39,7 +39,6 @@ export class BankAccountService {
   }
 
   async deposit(data: {
-    userId: string;
     accountId: string;
     amount: Prisma.Decimal;
   }): Promise<BankAccount> {
@@ -49,9 +48,7 @@ export class BankAccountService {
     if (!account) {
       throw new Error('Account not found');
     }
-    if (account.userId !== data.userId) {
-      throw new Error('Account does not belong to user');
-    }
+
     const result = await this.prisma.bankAccount.update({
       where: { id: data.accountId },
       data: { balance: account.balance.plus(data.amount) },

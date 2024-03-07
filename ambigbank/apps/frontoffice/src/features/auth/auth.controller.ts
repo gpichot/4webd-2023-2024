@@ -51,6 +51,7 @@ export class AuthController {
   @ApiOkResponse({ type: PrivateUserDto })
   async signIn(@Body() body: SignInDto) {
     const { email, password } = body;
+    console.log('email', email);
     return this.authService.signIn(email, password);
   }
 

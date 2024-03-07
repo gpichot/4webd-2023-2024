@@ -5,6 +5,9 @@ export default () => {
       notifications: {
         url: process.env.NOTIFICATIONS_URL,
       },
+      bankAccounts: {
+        url: process.env.BANK_ACCOUNTS_URL,
+      },
     },
   };
 };

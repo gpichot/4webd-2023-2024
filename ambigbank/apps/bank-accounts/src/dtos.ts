@@ -1,9 +1,14 @@
 import { Prisma } from 'db';
 import { Type } from 'class-transformer';
 import { IsDecimal, IsNotEmpty, IsUUID, MinLength } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiOkResponse, ApiProperty } from '@nestjs/swagger';
 
 export class CreateBankAccountDto {
+  @ApiProperty()
+  @IsNotEmpty()
+  @IsUUID()
+  userId: string;
+
   @ApiProperty()
   @IsNotEmpty()
   @MinLength(5)
@@ -26,17 +31,18 @@ export class PrivateBankAccountDto {
   @ApiProperty()
   @IsDecimal()
   @Type(() => DecimalNumber)
-  balance: string;
+  balance: Prisma.Decimal;
+
+  @ApiProperty()
+  @IsUUID()
+  userId: string;
 }
 
 export class DepositDto {
-  @ApiProperty()
+  @ApiProperty({ type: String })
   @Type(() => Prisma.Decimal)
-  @IsNotEmpty()
   amount: Prisma.Decimal;
 
   @ApiProperty()
-  @IsNotEmpty()
-  @IsUUID()
   accountId: string;
 }

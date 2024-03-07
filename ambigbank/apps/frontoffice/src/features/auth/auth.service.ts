@@ -19,6 +19,7 @@ export class AuthService {
     accessToken: string;
   }> {
     const user = await this.userService.user({ email: email });
+    console.log('user', user);
 
     if (!user) {
       throw new UnauthorizedException();

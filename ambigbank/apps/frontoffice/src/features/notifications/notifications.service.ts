@@ -1,7 +1,6 @@
 import { create } from 'apisauce';
 import { Inject, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { User } from 'db';
 
 type EmailNotification = {
   type: 'email';
@@ -18,7 +17,7 @@ type SMSNotification = {
 
 type AllNotification = {
   type: 'all';
-  to: User;
+  to: { email?: string; phoneNumber?: string };
   title: string;
   message: string;
 };

@@ -1,7 +1,7 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { Prisma, MoneyTransfer } from 'db';
 import { PrismaService } from '../../services/prisma.service';
-import { BankAccountService } from '../bank-accounts/bank-accounts.service';
+import { BankAccountService } from '../bank-accounts/bank-account.service';
 import { NotificationsService } from '../notifications/notifications.service';
 
 @Injectable()
@@ -22,9 +22,7 @@ export class TransfersService {
     amount: Prisma.Decimal;
   }): Promise<MoneyTransfer> {
     const { senderId, userId, receiverId, amount } = data;
-    const account = await this.bankAccountService.getBankAccount({
-      where: { id: senderId },
-    });
+    const account = await this.bankAccountService.getBankAccount(senderId);
 
     if (!account) {
       throw new BadRequestException('Sender account not found');

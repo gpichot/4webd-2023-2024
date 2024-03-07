@@ -1,5 +1,5 @@
 import { IsNotEmpty, MinLength } from 'class-validator';
-import { Exclude, Expose } from 'class-transformer';
+import { Expose } from 'class-transformer';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateUserDto {
@@ -22,7 +22,6 @@ export class CreateUserDto {
 
   @ApiProperty()
   @IsNotEmpty()
-  @Exclude()
   password: string;
 
   @ApiPropertyOptional()
@@ -52,6 +51,9 @@ export class UserDto {
   @ApiProperty()
   @Expose()
   lastName: string;
+
+  @Expose()
+  email: string;
 }
 
 export class PrivateUserDto extends UserDto {

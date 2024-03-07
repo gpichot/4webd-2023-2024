@@ -1,0 +1,23 @@
+{
+  "name": "@ambigbank/client-bank-accounts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "generate": "openapi-generator generate -g typescript-axios -i http://localhost:3003/api-json -o src/",
+    "dev": "tsup src/index.ts --format esm,cjs --watch --dts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "swagger-codegen": "^0.1.1",
+    "tsup": "^6.7.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "axios": "^1.6.7"
+  }
+}
