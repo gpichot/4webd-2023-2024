@@ -1,17 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable } from "@nestjs/common";
 import {
   AccountsApi,
   CreateBankAccountDto,
   DepositDto,
   PrivateBankAccountDto,
-} from '@ambigbank/client-bank-accounts';
+} from "@ambigbank/client-bank-accounts";
 
 @Injectable()
 export class BankAccountService {
-  private readonly accountsApi: AccountsApi = new AccountsApi({
-    basePath: 'http://localhost:3003',
-    isJsonMime: () => true,
-  });
+  constructor(private readonly accountsApi: AccountsApi) {}
 
   async createBankAccount(createBankAccountDto: CreateBankAccountDto) {
     const response =

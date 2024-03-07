@@ -1,15 +1,28 @@
 import { Module } from '@nestjs/common';
 import { BankAccountService } from '@ambigbank/services';
-import { CommonModule } from 'src/services/common.module';
 import { BankAccountsController } from './bank-accounts.controller';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthModule } from '../auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
+import { AccountsApi } from '@ambigbank/client-bank-accounts';
 
 @Module({
-  imports: [CommonModule, JwtModule, ConfigModule, AuthModule],
+  imports: [JwtModule, ConfigModule, AuthModule],
   controllers: [BankAccountsController],
-  providers: [BankAccountService],
+  providers: [
+    {
+      provide: BankAccountService,
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const accountsApi = new AccountsApi({
+          basePath: configService.get('services.bankAccounts.url'),
+          isJsonMime: () => true,
+        });
+
+        return new BankAccountService(accountsApi);
+      },
+    },
+  ],
   exports: [BankAccountService],
 })
 export class BankAccountModule {}

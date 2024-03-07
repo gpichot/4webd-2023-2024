@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { UsersController } from './users.controller';
 import { UserService } from './user.service';
-import { CommonModule } from 'src/services/common.module';
 import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -9,7 +8,6 @@ import { AuthGuard } from './auth.guard';
 
 @Module({
   imports: [
-    CommonModule,
     ConfigModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

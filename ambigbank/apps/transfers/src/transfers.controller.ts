@@ -34,6 +34,7 @@ class CreateTransferDto {
   amount: Prisma.Decimal;
 
   @ApiProperty()
+  @IsNotEmpty()
   @IsUUID()
   userId: string;
 }
@@ -49,6 +50,8 @@ class TransferDto {
   receiverId: string;
 
   @ApiProperty()
+  @Type(() => Prisma.Decimal)
+  @IsPositive()
   amount: Prisma.Decimal;
 }
 

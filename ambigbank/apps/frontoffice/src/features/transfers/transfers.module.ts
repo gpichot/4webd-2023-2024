@@ -1,23 +1,27 @@
 import { Module } from '@nestjs/common';
-import { CommonModule } from 'src/services/common.module';
 import { TransfersController } from './transfers.controller';
 import { TransfersService } from './transfers.service';
 import { BankAccountModule } from '../bank-accounts/bank-account.module';
 import { AuthModule } from '../auth/auth.module';
-import { NotificationsModule } from '../notifications/notifications.module';
 import { JwtModule } from '@nestjs/jwt';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { TransfersApi } from '@ambigbank/client-transfers';
 
 @Module({
-  imports: [
-    CommonModule,
-    JwtModule,
-    AuthModule,
-    ConfigModule,
-    BankAccountModule,
-    NotificationsModule,
-  ],
+  imports: [JwtModule, AuthModule, ConfigModule, BankAccountModule],
   controllers: [TransfersController],
-  providers: [TransfersService],
+  providers: [
+    {
+      provide: TransfersService,
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const transfersApi = new TransfersApi({
+          basePath: configService.get('services.transfers.url'),
+          isJsonMime: () => true,
+        });
+        return new TransfersService(transfersApi);
+      },
+    },
+  ],
 })
 export class TransferModule {}

@@ -7,7 +7,7 @@ import {
 
 @Injectable()
 export class TransfersService {
-  private readonly transfersApi: TransfersApi;
+  constructor(private readonly transfersApi: TransfersApi) {}
 
   async createTransfer(data: CreateTransferDto): Promise<TransferDto> {
     const response =

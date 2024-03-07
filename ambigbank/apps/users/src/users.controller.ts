@@ -124,7 +124,6 @@ export class UsersController {
   @ApiOkResponse({ type: AccessTokenDto })
   async signIn(@Body() body: SignInDto) {
     const { email, password } = body;
-    console.log('email', email);
     return this.userService.signIn(email, password);
   }
 }

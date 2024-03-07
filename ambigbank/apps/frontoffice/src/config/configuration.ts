@@ -8,6 +8,9 @@ export default () => {
       bankAccounts: {
         url: process.env.BANK_ACCOUNTS_URL,
       },
+      transfers: {
+        url: process.env.TRANSFERS_URL,
+      },
     },
     jwt: {
       secret: process.env.JWT_SECRET,

@@ -1,7 +1,7 @@
 import { Prisma } from 'db';
 import { Type } from 'class-transformer';
 import { IsDecimal, IsNotEmpty, IsUUID, MinLength } from 'class-validator';
-import { ApiOkResponse, ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateBankAccountDto {
   @ApiProperty()
