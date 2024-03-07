@@ -9,7 +9,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "dev": "pnpm run start:dev --preserveWatchOutput",
-    "start": "nest start",
+    "start": "node ./dist/src/main.js",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
@@ -20,6 +20,9 @@
     "test:debug": "vitest --inspect-brk --inspect --logHeapUsage --threads=false",
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
+  "files": [
+    "dist"
+  ],
   "dependencies": {
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.0",
@@ -32,6 +35,7 @@
     "db": "workspace:*",
     "dotenv": "^16.4.5",
     "express": "^4.18.3",
+    "bcrypt": "^5.1.1",
     "reflect-metadata": "^0.2.0",
     "rxjs": "^7.8.1",
     "vite-tsconfig-paths": "^4.3.1"
@@ -49,7 +53,6 @@
     "@typescript-eslint/eslint-plugin": "^6.0.0",
     "@typescript-eslint/parser": "^6.0.0",
     "@vitest/coverage-v8": "^1.3.1",
-    "bcrypt": "^5.1.1",
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",

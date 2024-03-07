@@ -24,10 +24,11 @@ import {
   ApiPropertyOptional,
   ApiTags,
 } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional } from 'class-validator';
 
 class UserSearchDto {
   @ApiPropertyOptional()
+  @IsOptional()
   @IsEmail()
   email?: string;
 }

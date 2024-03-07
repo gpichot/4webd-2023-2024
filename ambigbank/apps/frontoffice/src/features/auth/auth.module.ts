@@ -5,6 +5,7 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthGuard } from './auth.guard';
+import { UsersApi } from '@ambigbank/client-users';
 
 @Module({
   imports: [
@@ -22,7 +23,20 @@ import { AuthGuard } from './auth.guard';
     }),
   ],
   controllers: [UsersController, AuthController],
-  providers: [UserService, AuthGuard],
+  providers: [
+    {
+      provide: UserService,
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const usersApi = new UsersApi({
+          basePath: configService.get<string>('services.users.url'),
+          isJsonMime: () => true,
+        });
+        return new UserService(usersApi);
+      },
+    },
+    AuthGuard,
+  ],
   exports: [AuthGuard],
 })
 export class AuthModule {}

@@ -1,6 +1,9 @@
 export default () => {
   return {
     port: parseInt(process.env.PORT, 10) || 3005,
-    services: { bankAccounts: { url: process.env.BANK_ACCOUNTS_URL } },
+    services: {
+      bankAccounts: { url: process.env.BANK_ACCOUNTS_URL },
+      notifications: { url: process.env.NOTIFICATIONS_URL },
+    },
   };
 };

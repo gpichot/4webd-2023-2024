@@ -10,10 +10,7 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class UserService {
-  private readonly usersApi: UsersApi = new UsersApi({
-    basePath: 'http://localhost:3004',
-    isJsonMime: () => true,
-  });
+  constructor(private readonly usersApi: UsersApi) {}
 
   async user(userId: string): Promise<UserDto | null> {
     const response = await this.usersApi.usersControllerFindOne(userId);

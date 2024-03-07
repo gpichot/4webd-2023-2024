@@ -1,0 +1,85 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: youruser
+      POSTGRES_PASSWORD: yourpassword
+      POSTGRES_DB: yourdbname
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  frontoffice:
+    build:
+      context: .
+      target: frontoffice
+    image: frontoffice:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - users
+      - notifications
+      - bank-accounts
+      - transfers
+    environment:
+      PORT: ${FRONTOFFICE_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      NOTIFICATIONS_URL: ${NOTIFICATIONS_URL}
+      BANK_ACCOUNTS_URL: ${BANK_ACCOUNTS_URL}
+      USERS_URL: ${USERS_URL}
+      TRANSFERS_URL: ${TRANSFERS_URL}
+
+  notifications:
+    build:
+      context: .
+      target: notifications
+    image: notifications:latest
+    environment:
+      DATABASE_URL: postgresql://youruser:yourpassword@postgres:5432/yourdbname
+      PORT: ${NOTIFICATIONS_PORT}
+    depends_on:
+      - postgres
+
+  bank-accounts:
+    build:
+      context: .
+      target: bank-accounts
+    image: bank-accounts:latest
+    environment:
+      DATABASE_URL: postgresql://youruser:yourpassword@postgres:5432/yourdbname
+      PORT: ${BANK_ACCOUNTS_PORT}
+      NOTIFICATIONS_URL: ${NOTIFICATIONS_URL}
+      BANK_ACCOUNTS_PORT: ${BANK_ACCOUNTS_URL}
+    depends_on:
+      - postgres
+
+  users:
+    build:
+      context: .
+      target: users
+    image: users:latest
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgresql://youruser:yourpassword@postgres:5432/yourdbname
+      PORT: ${USERS_PORT}
+    depends_on:
+      - postgres
+
+  transfers:
+    build:
+      context: .
+      target: transfers
+    image: transfers:latest
+    environment:
+      DATABASE_URL: postgresql://youruser:yourpassword@postgres:5432/yourdbname
+      NOTIFICATIONS_URL: ${NOTIFICATIONS_URL}
+      BANK_ACCOUNTS_URL: ${BANK_ACCOUNTS_URL}
+      PORT: ${TRANSFERS_PORT}
+    depends_on:
+      - postgres
+
+volumes:
+  pgdata:

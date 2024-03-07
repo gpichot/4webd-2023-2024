@@ -11,6 +11,9 @@ export default () => {
       transfers: {
         url: process.env.TRANSFERS_URL,
       },
+      users: {
+        url: process.env.USERS_URL,
+      },
     },
     jwt: {
       secret: process.env.JWT_SECRET,

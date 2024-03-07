@@ -9,7 +9,7 @@
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "dev": "pnpm run start:dev --preserveWatchOutput",
-    "start": "nest start",
+    "start": "node ./dist/src/main.js",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
@@ -20,6 +20,9 @@
     "test:debug": "vitest --inspect-brk --inspect --logHeapUsage --threads=false",
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
+  "files": [
+    "dist"
+  ],
   "dependencies": {
     "@ambigbank/client-bank-accounts": "workspace:*",
     "@ambigbank/services": "workspace:*",

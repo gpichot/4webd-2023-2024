@@ -34,6 +34,7 @@ export class BankAccountService {
   }): Promise<BankAccount[]> {
     const result = await this.prisma.bankAccount.findMany({
       where: params.where,
+      orderBy: { createdAt: 'asc' },
     });
     return result;
   }
