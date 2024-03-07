@@ -39,3 +39,6 @@ yarn-error.log*
 
 *.db
 *.db-journal
+
+.openapi-generator
+.openapi-generator-ignore

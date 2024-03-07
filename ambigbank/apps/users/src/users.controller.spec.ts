@@ -1,13 +1,12 @@
-import { describe, afterEach, beforeEach, it, expect } from 'vitest';
+import { describe, afterEach, beforeEach, it, expect, assert } from 'vitest';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersController } from './users.controller';
-import { UserService } from './user.service';
-import { CommonModule } from '../../services/common.module';
-import { AuthModule } from '../auth/auth.module';
+import { UserService } from './users.service';
+import { CommonModule } from './services/common.module';
 import { User } from 'db';
 import { prisma } from 'db';
-import { BankAccountModule } from '../bank-accounts/bank-account.module';
-import { NotificationsModule } from '../notifications/notifications.module';
+import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 
 describe('UsersController', () => {
   let userController: UsersController;
@@ -28,9 +27,8 @@ describe('UsersController', () => {
     const app: TestingModule = await Test.createTestingModule({
       imports: [
         CommonModule,
-        AuthModule,
-        BankAccountModule,
-        NotificationsModule,
+        ConfigModule,
+        JwtModule.register({ secret: 'secret' }),
       ],
       controllers: [UsersController],
       providers: [UserService],
@@ -67,9 +65,30 @@ describe('UsersController', () => {
     expect(users).toEqual([
       {
         id: expect.any(String),
+        email: 'john@example.com',
         firstName: 'John',
         lastName: 'Doe',
       },
     ]);
+  });
+
+  it.skip('can sign in', async () => {
+    const result = await userController.signIn({
+      email: 'john@example.com',
+      password: 'password',
+    });
+
+    assert(result.accessToken);
+
+    const token = result.accessToken.split('.')[1];
+
+    const payload = JSON.parse(Buffer.from(token, 'base64').toString('utf-8'));
+
+    expect(payload).toEqual({
+      email: user.email,
+      exp: expect.any(Number),
+      iat: expect.any(Number),
+      sub: user.id,
+    });
   });
 });

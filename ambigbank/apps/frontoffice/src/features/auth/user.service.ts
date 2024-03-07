@@ -1,69 +1,53 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { PrismaService } from '../../services/prisma.service';
-import { User, Prisma } from 'db';
+import {
+  AccessTokenDto,
+  CreateUserDto,
+  SignInDto,
+  UpdateUserDto,
+  UserDto,
+  UsersApi,
+} from '@ambigbank/client-users';
+import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class UserService {
-  @Inject(PrismaService)
-  private readonly prisma: PrismaService;
+  private readonly usersApi: UsersApi = new UsersApi({
+    basePath: 'http://localhost:3004',
+    isJsonMime: () => true,
+  });
 
-  async user(
-    userWhereUniqueInput: Prisma.UserWhereUniqueInput,
-  ): Promise<User | null> {
-    const user = await this.prisma.user.findUnique({
-      where: userWhereUniqueInput,
-    });
+  async user(userId: string): Promise<UserDto | null> {
+    const response = await this.usersApi.usersControllerFindOne(userId);
 
-    if (!user) return null;
-
-    return user;
+    return response.data;
   }
 
-  async users(params: {
-    skip?: number;
-    take?: number;
-    cursor?: Prisma.UserWhereUniqueInput;
-    where?: Prisma.UserWhereInput;
-    orderBy?: Prisma.UserOrderByWithRelationInput;
-  }): Promise<User[]> {
-    const { skip, take, cursor, where, orderBy } = params;
-    const users = await this.prisma.user.findMany({
-      skip,
-      take,
-      cursor,
-      where,
-      orderBy,
-    });
+  async users({ email }: { email?: string } = {}): Promise<UserDto[]> {
+    const response = await this.usersApi.usersControllerFindAll(email);
 
-    return users;
+    return response.data;
   }
 
-  async createUser(data: Prisma.UserCreateInput): Promise<User> {
-    const result = await this.prisma.user.create({
-      data,
-    });
+  async createUser(data: CreateUserDto): Promise<UserDto> {
+    const response = await this.usersApi.usersControllerCreate(data);
 
-    return result;
+    return response.data;
   }
 
-  async updateUser(params: {
-    where: Prisma.UserWhereUniqueInput;
-    data: Prisma.UserUpdateInput;
-  }): Promise<User> {
-    const { where, data } = params;
-    const user = await this.prisma.user.update({
-      data,
-      where,
-    });
+  async updateUser(userId: string, params: UpdateUserDto): Promise<UserDto> {
+    const response = await this.usersApi.usersControllerUpdate(userId, params);
 
-    return user;
+    return response.data;
   }
 
-  async deleteUser(where: Prisma.UserWhereUniqueInput): Promise<User> {
-    const user = await this.prisma.user.delete({
-      where,
-    });
+  async deleteUser(userId: string): Promise<UserDto> {
+    const response = await this.usersApi.usersControllerRemove(userId);
 
-    return user;
+    return response.data;
+  }
+
+  async signIn(payload: SignInDto): Promise<AccessTokenDto> {
+    const response = await this.usersApi.usersControllerSignIn(payload);
+
+    return response.data;
   }
 }

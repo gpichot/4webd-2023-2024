@@ -3,7 +3,6 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { BankAccountsController } from './bank-accounts.controller';
 import { BankAccountService } from './bank-accounts.service';
 import { CommonModule } from 'src/services/common.module';
-import { AuthModule } from '../auth/auth.module';
 import { Prisma, User, prisma } from 'db';
 
 describe('BankAccountController', () => {
@@ -20,7 +19,7 @@ describe('BankAccountController', () => {
       },
     });
     const app: TestingModule = await Test.createTestingModule({
-      imports: [CommonModule, AuthModule],
+      imports: [CommonModule],
       controllers: [BankAccountsController],
       providers: [BankAccountService],
     }).compile();
@@ -31,7 +30,8 @@ describe('BankAccountController', () => {
   });
 
   it('can create an account and list it', async () => {
-    const bankAccount = await bankAccountController.createBankAccount(user, {
+    const bankAccount = await bankAccountController.createBankAccount({
+      userId: user.id,
       title: 'My Bank Account',
     });
 
@@ -43,17 +43,20 @@ describe('BankAccountController', () => {
       userId: user.id,
     });
 
-    const userAccounts = await bankAccountController.listBankAccounts(user);
+    const userAccounts = await bankAccountController.listBankAccounts({
+      userId: user.id,
+    });
     expect(userAccounts).toHaveLength(1);
 
     expect(userAccounts[0].id).toBe(bankAccount.id);
   });
 
   it('can deposit money', async () => {
-    const bankAccount = await bankAccountController.createBankAccount(user, {
+    const bankAccount = await bankAccountController.createBankAccount({
+      userId: user.id,
       title: 'My Bank Account',
     });
-    const updatedAccount = await bankAccountController.deposit(user, {
+    const updatedAccount = await bankAccountController.deposit({
       accountId: bankAccount.id,
       amount: new Prisma.Decimal(100),
     });

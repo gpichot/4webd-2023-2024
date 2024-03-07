@@ -9,5 +9,8 @@ export default () => {
         url: process.env.BANK_ACCOUNTS_URL,
       },
     },
+    jwt: {
+      secret: process.env.JWT_SECRET,
+    },
   };
 };

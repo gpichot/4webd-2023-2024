@@ -5,9 +5,18 @@ import { TransfersService } from './transfers.service';
 import { BankAccountModule } from '../bank-accounts/bank-account.module';
 import { AuthModule } from '../auth/auth.module';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [CommonModule, AuthModule, BankAccountModule, NotificationsModule],
+  imports: [
+    CommonModule,
+    JwtModule,
+    AuthModule,
+    ConfigModule,
+    BankAccountModule,
+    NotificationsModule,
+  ],
   controllers: [TransfersController],
   providers: [TransfersService],
 })
