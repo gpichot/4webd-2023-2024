@@ -46,7 +46,7 @@ export class BankAccountsController {
     const result = await this.bankAccountService.createBankAccount({
       ...payload,
       balance: 0,
-      user: { connect: { id: userId } },
+      userId,
     });
 
     return plainToClass(PrivateBankAccountDto, result);

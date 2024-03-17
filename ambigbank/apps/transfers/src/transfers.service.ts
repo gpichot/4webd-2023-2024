@@ -1,5 +1,5 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { Prisma, MoneyTransfer } from 'db';
+import { Prisma, MoneyTransfer } from 'PrismaClient';
 import { PrismaService } from './services/prisma.service';
 import { NotificationsService, BankAccountService } from '@ambigbank/services';
 
@@ -36,57 +36,57 @@ export class TransfersService {
       throw new BadRequestException('Cannot send to yourself');
     }
 
-    const moneyTransfer = await this.prisma.$transaction(async (tx) => {
-      const sender = await tx.bankAccount.findUnique({
-        where: { id: data.senderId },
-      });
+    // const moneyTransfer = await this.prisma.$transaction(async (tx) => {
+    //   const sender = await tx.bankAccount.findUnique({
+    //     where: { id: data.senderId },
+    //   });
 
-      if (sender.balance < amount) {
-        throw new BadRequestException('Insufficient funds');
-      }
+    //   if (sender.balance < amount) {
+    //     throw new BadRequestException('Insufficient funds');
+    //   }
 
-      await tx.bankAccount.update({
-        where: { id: senderId },
-        data: { balance: sender.balance.minus(amount) },
-      });
+    //   await tx.bankAccount.update({
+    //     where: { id: senderId },
+    //     data: { balance: sender.balance.minus(amount) },
+    //   });
 
-      await tx.bankAccount.update({
-        where: { id: receiverId },
-        data: { balance: { increment: amount } },
-      });
+    //   await tx.bankAccount.update({
+    //     where: { id: receiverId },
+    //     data: { balance: { increment: amount } },
+    //   });
 
-      return await tx.moneyTransfer.create({
-        data: {
-          fromAccountId: senderId,
-          toAccountId: receiverId,
-          amount,
-        },
-      });
-    });
+    //   return await tx.moneyTransfer.create({
+    //     data: {
+    //       fromAccountId: senderId,
+    //       toAccountId: receiverId,
+    //       amount,
+    //     },
+    //   });
+    // });
 
     // FIXME: use a bus for this
-    const sender = await this.prisma.user.findUnique({
-      where: { id: userId },
-    });
-    const receiver = await this.prisma.user.findFirst({
-      where: { accounts: { some: { id: receiverId } } },
-    });
+    // const sender = await this.prisma.user.findUnique({
+    //   where: { id: userId },
+    // });
+    // const receiver = await this.prisma.user.findFirst({
+    //   where: { accounts: { some: { id: receiverId } } },
+    // });
 
-    this.notificationsService.sendNotification({
-      type: 'all',
-      to: sender,
-      title: `${amount}€ sent 💸`,
-      message: `You have sent ${amount} to ${receiver.firstName}`,
-    });
+    // this.notificationsService.sendNotification({
+    //   type: 'all',
+    //   to: sender,
+    //   title: `${amount}€ sent 💸`,
+    //   message: `You have sent ${amount} to ${receiver.firstName}`,
+    // });
 
-    this.notificationsService.sendNotification({
-      type: 'all',
-      to: receiver,
-      title: `${amount}€ received 🤑`,
-      message: `You have received ${amount} from ${sender.firstName}`,
-    });
+    // this.notificationsService.sendNotification({
+    //   type: 'all',
+    //   to: receiver,
+    //   title: `${amount}€ received 🤑`,
+    //   message: `You have received ${amount} from ${sender.firstName}`,
+    // });
 
-    return moneyTransfer;
+    return null;
   }
   async listTransfers(params: {
     where: Prisma.MoneyTransferWhereInput;

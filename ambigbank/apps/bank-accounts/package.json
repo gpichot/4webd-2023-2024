@@ -18,7 +18,8 @@
     "test:watch": "vitest --watch",
     "test:cov": "vitest --coverage",
     "test:debug": "vitest --inspect-brk --inspect --logHeapUsage --threads=false",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "db:migrate:dev": "prisma migrate dev"
   },
   "files": [
     "dist"
@@ -30,9 +31,9 @@
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/swagger": "^7.3.0",
+    "@prisma/client": "5.10.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
-    "db": "workspace:*",
     "dotenv": "^16.4.5",
     "express": "^4.18.3",
     "reflect-metadata": "^0.2.0",

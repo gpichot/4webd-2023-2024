@@ -9,7 +9,7 @@ import {
 import { TransfersService } from './transfers.service';
 import { IsNotEmpty, IsPositive, IsUUID } from 'class-validator';
 import { Type, plainToClass } from 'class-transformer';
-import { Prisma } from 'db';
+import { Prisma } from 'PrismaClient';
 import {
   ApiOkResponse,
   ApiOperation,

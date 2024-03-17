@@ -3,7 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { TransfersController } from './transfers.controller';
 import { TransfersService } from './transfers.service';
 import { CommonModule } from 'src/services/common.module';
-import { BankAccount, Prisma, User, prisma } from 'db';
+import { BankAccount, Prisma, User, prisma } from 'PrismaClient';
 import { BankAccountService, NotificationsService } from '@ambigbank/services';
 import { ConfigModule } from '@nestjs/config';
 

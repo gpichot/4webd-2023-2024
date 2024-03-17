@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { Prisma } from 'db';
+import { Prisma } from 'PrismaClient';
 import { expect } from 'vitest';
 
 dotenv.config({ path: '.env.test' });
