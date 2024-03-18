@@ -1,0 +1,126 @@
+version: "3.8"
+
+services:
+  pgusers:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: users
+      POSTGRES_PASSWORD: users
+      POSTGRES_DB: users
+    volumes:
+      - pgusersdata:/var/lib/postgresql/data
+
+  pgbankaccounts:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: bankaccounts
+      POSTGRES_PASSWORD: bankaccounts
+      POSTGRES_DB: bankaccounts
+    volumes:
+      - pgbankaccountsdata:/var/lib/postgresql/data
+
+  pgtransfers:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: transfers
+      POSTGRES_PASSWORD: transfers
+      POSTGRES_DB: transfers
+    volumes:
+      - pgtransfersdata:/var/lib/postgresql/data
+
+  frontoffice:
+    build:
+      dockerfile: Dockerfile.dev
+      context: .
+      # target: frontoffice
+    # image: frontoffice:latest
+    volumes:
+      - ./:/app/
+    ports:
+      - "8080:8080"
+    depends_on:
+      - users
+      - bank-accounts
+      - transfers
+    command: ["pnpm", "run", "dev", "--filter=./apps/frontoffice"]
+    environment:
+      PORT: ${FRONTOFFICE_PORT}
+      JWT_SECRET: ${JWT_SECRET}
+      NOTIFICATIONS_URL: ${NOTIFICATIONS_URL}
+      BANK_ACCOUNTS_URL: ${BANK_ACCOUNTS_URL}
+      USERS_URL: ${USERS_URL}
+      TRANSFERS_URL: ${TRANSFERS_URL}
+
+  notifications:
+    build:
+      dockerfile: Dockerfile.dev
+      context: .
+    # image: notifications:latest
+    volumes:
+      - ./:/app/
+    command: ["pnpm", "run", "dev", "--filter=./apps/notifications"]
+    environment:
+      PORT: ${NOTIFICATIONS_PORT}
+    ports:
+      - "${NOTIFICATIONS_PORT}:${NOTIFICATIONS_PORT}"
+
+  bank-accounts:
+    build:
+      dockerfile: Dockerfile.dev
+      context: .
+      # target: bank-accounts
+    # image: bank-accounts:latest
+    volumes:
+      - ./:/app/
+    command: ["pnpm", "run", "dev", "--filter=./apps/bank-accounts"]
+    environment:
+      DATABASE_URL: postgresql://bankaccounts:bankaccounts@pgbankaccounts:5432/bankaccounts
+      PORT: ${BANK_ACCOUNTS_PORT}
+      NOTIFICATIONS_URL: ${NOTIFICATIONS_URL}
+      BANK_ACCOUNTS_PORT: ${BANK_ACCOUNTS_URL}
+    ports:
+      - "${BANK_ACCOUNTS_PORT}:${BANK_ACCOUNTS_PORT}"
+    depends_on:
+      - pgbankaccounts
+
+  users:
+    build:
+      dockerfile: Dockerfile.dev
+      context: .
+      # target: users
+    # image: users:latest
+    volumes:
+      - ./:/app/
+    command: ["pnpm", "run", "dev", "--filter=./apps/users"]
+    environment:
+      JWT_SECRET: ${JWT_SECRET}
+      DATABASE_URL: postgresql://users:users@pgusers:5432/users
+      PORT: ${USERS_PORT}
+    ports:
+      - "${USERS_PORT}:${USERS_PORT}"
+    depends_on:
+      - pgusers
+
+  transfers:
+    build:
+      dockerfile: Dockerfile.dev
+      context: .
+      # target: transfers
+    # image: transfers:latest
+    volumes:
+      - ./:/app/
+    command: ["pnpm", "run", "dev", "--filter=./apps/transfers"]
+    environment:
+      DATABASE_URL: postgresql://transfers:transfers@pgtransfers:5432/transfers
+      NOTIFICATIONS_URL: ${NOTIFICATIONS_URL}
+      BANK_ACCOUNTS_URL: ${BANK_ACCOUNTS_URL}
+      PORT: ${TRANSFERS_PORT}
+    ports:
+      - "${TRANSFERS_PORT}:${TRANSFERS_PORT}"
+    depends_on:
+      - pgtransfers
+
+volumes:
+  pgusersdata:
+  pgbankaccountsdata:
+  pgtransfersdata:
