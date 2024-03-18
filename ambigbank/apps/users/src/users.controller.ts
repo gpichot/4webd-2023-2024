@@ -71,7 +71,7 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Get user by id' })
   @Get(':id')
-  @ApiOkResponse({ type: UserDto })
+  @ApiOkResponse({ type: PrivateUserDto })
   async findOne(@Param('id') id: string) {
     const user = await this.userService.user({ id });
     return plainToClass(UserDto, user, { excludeExtraneousValues: true });

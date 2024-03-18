@@ -422,6 +422,9 @@ importers:
       '@ambigbank/client-bank-accounts':
         specifier: workspace:*
         version: link:../../packages/client-bank-accounts
+      '@ambigbank/client-users':
+        specifier: workspace:*
+        version: link:../../packages/client-users
       '@ambigbank/services':
         specifier: workspace:*
         version: link:../../packages/services
@@ -795,6 +798,9 @@ importers:
       '@ambigbank/client-bank-accounts':
         specifier: workspace:*
         version: link:../client-bank-accounts
+      '@ambigbank/client-users':
+        specifier: workspace:*
+        version: link:../client-users
       tsup:
         specifier: ^6.7.0
         version: 6.7.0(typescript@5.3.3)

@@ -4,6 +4,7 @@ export default () => {
     services: {
       bankAccounts: { url: process.env.BANK_ACCOUNTS_URL },
       notifications: { url: process.env.NOTIFICATIONS_URL },
+      users: { url: process.env.USERS_URL },
     },
   };
 };

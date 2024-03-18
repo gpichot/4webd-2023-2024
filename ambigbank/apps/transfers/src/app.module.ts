@@ -4,8 +4,13 @@ import { CommonModule } from './services/common.module';
 import { TransfersController } from './transfers.controller';
 import { TransfersService } from './transfers.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UsersApi } from '@ambigbank/client-users';
 import configuration from './config/configuration';
-import { BankAccountService, NotificationsService } from '@ambigbank/services';
+import {
+  BankAccountService,
+  NotificationsService,
+  UserService,
+} from '@ambigbank/services';
 import { AccountsApi } from '@ambigbank/client-bank-accounts';
 
 @Module({
@@ -19,6 +24,17 @@ import { AccountsApi } from '@ambigbank/client-bank-accounts';
   controllers: [TransfersController],
   providers: [
     TransfersService,
+    {
+      provide: UserService,
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        const usersApi = new UsersApi({
+          basePath: configService.get('services.users.url'),
+          isJsonMime: () => true,
+        });
+        return new UserService(usersApi);
+      },
+    },
     {
       provide: BankAccountService,
       inject: [ConfigService],

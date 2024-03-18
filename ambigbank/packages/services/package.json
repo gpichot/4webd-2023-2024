@@ -13,6 +13,7 @@
   "license": "ISC",
   "devDependencies": {
     "@ambigbank/client-bank-accounts": "workspace:*",
+    "@ambigbank/client-users": "workspace:*",
     "tsup": "^6.7.0",
     "typescript": "^5.3.3"
   },

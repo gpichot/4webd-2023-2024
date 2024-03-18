@@ -1,12 +1,19 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
 import { Prisma, MoneyTransfer } from 'PrismaClient';
 import { PrismaService } from './services/prisma.service';
-import { NotificationsService, BankAccountService } from '@ambigbank/services';
+import {
+  NotificationsService,
+  BankAccountService,
+  UserService,
+} from '@ambigbank/services';
 
 @Injectable()
 export class TransfersService {
   @Inject(PrismaService)
   private readonly prisma: PrismaService;
+
+  @Inject(UserService)
+  private readonly userService: UserService;
 
   @Inject(BankAccountService)
   private readonly bankAccountService: BankAccountService;
@@ -18,16 +25,18 @@ export class TransfersService {
     userId: string;
     senderId: string;
     receiverId: string;
-    amount: Prisma.Decimal;
+    amount: string;
   }): Promise<MoneyTransfer> {
-    const { senderId, userId, receiverId, amount } = data;
-    const account = await this.bankAccountService.getBankAccount(senderId);
+    const amount = new Prisma.Decimal(data.amount);
+    const { senderId, userId, receiverId } = data;
+    const accountSender =
+      await this.bankAccountService.getBankAccount(senderId);
 
-    if (!account) {
+    if (!accountSender) {
       throw new BadRequestException('Sender account not found');
     }
 
-    if (account.userId !== userId) {
+    if (accountSender.userId !== userId) {
       throw new BadRequestException('Sender account does not belong to user');
     }
 
@@ -36,57 +45,51 @@ export class TransfersService {
       throw new BadRequestException('Cannot send to yourself');
     }
 
-    // const moneyTransfer = await this.prisma.$transaction(async (tx) => {
-    //   const sender = await tx.bankAccount.findUnique({
-    //     where: { id: data.senderId },
-    //   });
+    if (accountSender.balance < amount) {
+      throw new BadRequestException('Insufficient funds');
+    }
 
-    //   if (sender.balance < amount) {
-    //     throw new BadRequestException('Insufficient funds');
-    //   }
+    const responseReceiver = await this.bankAccountService.deposit({
+      accountId: receiverId,
+      amount: amount.toString(),
+    });
 
-    //   await tx.bankAccount.update({
-    //     where: { id: senderId },
-    //     data: { balance: sender.balance.minus(amount) },
-    //   });
+    const responseSender = await this.bankAccountService.deposit({
+      accountId: senderId,
+      amount: amount.mul(-1).toString(),
+    });
 
-    //   await tx.bankAccount.update({
-    //     where: { id: receiverId },
-    //     data: { balance: { increment: amount } },
-    //   });
+    if (!responseReceiver || !responseSender) {
+      throw new BadRequestException('Transaction failed');
+    }
 
-    //   return await tx.moneyTransfer.create({
-    //     data: {
-    //       fromAccountId: senderId,
-    //       toAccountId: receiverId,
-    //       amount,
-    //     },
-    //   });
-    // });
+    // FIXME: How to handle the transaction failure here?
+    const transfer = await this.prisma.moneyTransfer.create({
+      data: {
+        fromAccountId: senderId,
+        toAccountId: receiverId,
+        amount,
+      },
+    });
 
-    // FIXME: use a bus for this
-    // const sender = await this.prisma.user.findUnique({
-    //   where: { id: userId },
-    // });
-    // const receiver = await this.prisma.user.findFirst({
-    //   where: { accounts: { some: { id: receiverId } } },
-    // });
+    const sender = await this.userService.getUser(userId);
+    const receiver = await this.userService.getUser(userId);
 
-    // this.notificationsService.sendNotification({
-    //   type: 'all',
-    //   to: sender,
-    //   title: `${amount}€ sent 💸`,
-    //   message: `You have sent ${amount} to ${receiver.firstName}`,
-    // });
+    this.notificationsService.sendNotification({
+      type: 'all',
+      to: sender,
+      title: `${amount}€ sent 💸`,
+      message: `You have sent ${amount} to ${receiver.firstName}`,
+    });
 
-    // this.notificationsService.sendNotification({
-    //   type: 'all',
-    //   to: receiver,
-    //   title: `${amount}€ received 🤑`,
-    //   message: `You have received ${amount} from ${sender.firstName}`,
-    // });
+    this.notificationsService.sendNotification({
+      type: 'all',
+      to: receiver,
+      title: `${amount}€ received 🤑`,
+      message: `You have received ${amount} from ${sender.firstName}`,
+    });
 
-    return null;
+    return transfer;
   }
   async listTransfers(params: {
     where: Prisma.MoneyTransferWhereInput;

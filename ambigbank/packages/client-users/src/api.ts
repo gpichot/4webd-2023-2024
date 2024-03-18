@@ -444,7 +444,7 @@ export const UsersApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async usersControllerFindOne(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<UserDto>> {
+        async usersControllerFindOne(id: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<PrivateUserDto>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.usersControllerFindOne(id, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['UsersApi.usersControllerFindOne']?.[localVarOperationServerIndex]?.url;
@@ -527,7 +527,7 @@ export const UsersApiFactory = function (configuration?: Configuration, basePath
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        usersControllerFindOne(id: string, options?: any): AxiosPromise<UserDto> {
+        usersControllerFindOne(id: string, options?: any): AxiosPromise<PrivateUserDto> {
             return localVarFp.usersControllerFindOne(id, options).then((request) => request(axios, basePath));
         },
         /**
