@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Inject,
   Post,
   UseGuards,
@@ -53,7 +54,15 @@ export class TransfersController {
       userId: user.id,
       senderId: body.accountSenderId,
       receiverId: body.accountReceiverId,
-      amount: body.amount,
+      amount: body.amount.toFixed(2),
     });
+  }
+
+  @ApiOperation({ summary: 'List transfers' })
+  @Get()
+  @ApiOkResponse()
+  @UseGuards(AuthGuard)
+  async listTransfers() {
+    return this.transfersService.listTransfers();
   }
 }

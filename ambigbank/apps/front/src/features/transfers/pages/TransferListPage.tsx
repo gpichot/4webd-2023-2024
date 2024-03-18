@@ -27,8 +27,8 @@ export default function TransferListPage() {
           <Table.Tr key={transfer.id}>
             <Table.Td>{transfer.id}</Table.Td>
             <Table.Td>{transfer.amount}</Table.Td>
-            <Table.Td>{transfer.sender}</Table.Td>
-            <Table.Td>{transfer.receiver}</Table.Td>
+            <Table.Td>{transfer.senderId}</Table.Td>
+            <Table.Td>{transfer.receiverId}</Table.Td>
           </Table.Tr>
         ))}
       </Table.Tbody>

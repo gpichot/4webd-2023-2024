@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   Inject,
   Post,
   UsePipes,
@@ -8,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { TransfersService } from './transfers.service';
 import { IsNotEmpty, IsPositive, IsUUID } from 'class-validator';
-import { Type, plainToClass } from 'class-transformer';
+import { Expose, Type, plainToClass } from 'class-transformer';
 import { Prisma } from 'PrismaClient';
 import {
   ApiOkResponse,
@@ -40,17 +41,21 @@ class CreateTransferDto {
 
 class TransferDto {
   @ApiProperty()
+  @Expose()
   id: string;
 
   @ApiProperty()
+  @Expose()
   senderId: string;
 
   @ApiProperty()
+  @Expose()
   receiverId: string;
 
   @ApiProperty()
   @Type(() => Prisma.Decimal)
   @IsPositive()
+  @Expose()
   amount: Prisma.Decimal;
 }
 
@@ -70,5 +75,29 @@ export class TransfersController {
       this.transfersService.createTransfer(body),
       { excludeExtraneousValues: true },
     );
+  }
+
+  @ApiOperation({ summary: 'List transfers' })
+  @Get()
+  @ApiOkResponse({ type: [TransferDto] })
+  async listTransfers() {
+    const transfers = await this.transfersService.listTransfers({});
+
+    const items = transfers.map((transfer) => {
+      return plainToClass(
+        TransferDto,
+        {
+          id: transfer.id,
+          amount: transfer.amount.toString(),
+          senderId: transfer.fromAccountId,
+          receiverId: transfer.toAccountId,
+        },
+        {
+          excludeExtraneousValues: true,
+        },
+      );
+    });
+
+    return items;
   }
 }

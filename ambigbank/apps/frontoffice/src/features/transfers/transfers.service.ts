@@ -15,4 +15,9 @@ export class TransfersService {
 
     return response.data;
   }
+
+  async listTransfers(): Promise<TransferDto[]> {
+    const response = await this.transfersApi.transfersControllerListTransfers();
+    return response.data;
+  }
 }

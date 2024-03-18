@@ -91,9 +91,12 @@ export class TransfersService {
 
     return transfer;
   }
-  async listTransfers(params: {
-    where: Prisma.MoneyTransferWhereInput;
-  }): Promise<MoneyTransfer[]> {
+
+  async listTransfers(
+    params: {
+      where?: Prisma.MoneyTransferWhereInput;
+    } = {},
+  ): Promise<MoneyTransfer[]> {
     const result = await this.prisma.moneyTransfer.findMany({
       where: params.where,
     });

@@ -1,5 +1,6 @@
 export interface Transfer {
+  id: string;
   amount: string;
   senderId: string;
-  receivedId: string;
+  receiverId: string;
 }

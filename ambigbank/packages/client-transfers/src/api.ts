@@ -43,10 +43,10 @@ export interface CreateTransferDto {
     'receiverId': string;
     /**
      * 
-     * @type {number}
+     * @type {string}
      * @memberof CreateTransferDto
      */
-    'amount': number;
+    'amount': string;
     /**
      * 
      * @type {string}
@@ -128,6 +128,36 @@ export const TransfersApiAxiosParamCreator = function (configuration?: Configura
                 options: localVarRequestOptions,
             };
         },
+        /**
+         * 
+         * @summary List transfers
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        transfersControllerListTransfers: async (options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            const localVarPath = `/transfers`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'GET', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
     }
 };
 
@@ -151,6 +181,18 @@ export const TransfersApiFp = function(configuration?: Configuration) {
             const localVarOperationServerBasePath = operationServerMap['TransfersApi.transfersControllerCreateTransfer']?.[localVarOperationServerIndex]?.url;
             return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
         },
+        /**
+         * 
+         * @summary List transfers
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async transfersControllerListTransfers(options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<TransferDto>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.transfersControllerListTransfers(options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['TransfersApi.transfersControllerListTransfers']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
     }
 };
 
@@ -170,6 +212,15 @@ export const TransfersApiFactory = function (configuration?: Configuration, base
          */
         transfersControllerCreateTransfer(createTransferDto: CreateTransferDto, options?: any): AxiosPromise<TransferDto> {
             return localVarFp.transfersControllerCreateTransfer(createTransferDto, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
+         * @summary List transfers
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        transfersControllerListTransfers(options?: any): AxiosPromise<Array<TransferDto>> {
+            return localVarFp.transfersControllerListTransfers(options).then((request) => request(axios, basePath));
         },
     };
 };
@@ -191,6 +242,17 @@ export class TransfersApi extends BaseAPI {
      */
     public transfersControllerCreateTransfer(createTransferDto: CreateTransferDto, options?: RawAxiosRequestConfig) {
         return TransfersApiFp(this.configuration).transfersControllerCreateTransfer(createTransferDto, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary List transfers
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof TransfersApi
+     */
+    public transfersControllerListTransfers(options?: RawAxiosRequestConfig) {
+        return TransfersApiFp(this.configuration).transfersControllerListTransfers(options).then((request) => request(this.axios, this.basePath));
     }
 }
 
