@@ -30,7 +30,6 @@ class CreateTransferDto {
   receiverId: string;
 
   @ApiProperty({ type: String })
-  @IsPositive()
   amount: string;
 
   @ApiProperty()

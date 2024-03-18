@@ -26,7 +26,7 @@ export class TransfersService {
     senderId: string;
     receiverId: string;
     amount: string;
-  }): Promise<MoneyTransfer> {
+  }): Promise<Omit<MoneyTransfer, 'amount'> & { amount: string }> {
     const amount = new Prisma.Decimal(data.amount);
     const { senderId, userId, receiverId } = data;
     const accountSender =
@@ -89,7 +89,10 @@ export class TransfersService {
       message: `You have received ${amount} from ${sender.firstName}`,
     });
 
-    return transfer;
+    return {
+      ...transfer,
+      amount: transfer.amount.toString(),
+    };
   }
 
   async listTransfers(
