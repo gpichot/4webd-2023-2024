@@ -40,7 +40,7 @@ Run the corresponding app and go to `http://localhost:3000/api`.
 ### Running
 
 ```bash
-COMPOSE_FILE=docker.compose.dev.yml docker-compose up
+COMPOSE_FILE=docker-compose.dev.yml docker-compose up
 ```
 
 ### Migrate databases
