@@ -20,6 +20,8 @@ export default function TransferListPage() {
           <Table.Td>Amount</Table.Td>
           <Table.Td>Sender</Table.Td>
           <Table.Td>Receiver</Table.Td>
+          <Table.Td>Status</Table.Td>
+          <Table.Td>Error Reason</Table.Td>
         </Table.Tr>
       </Table.Thead>
       <Table.Tbody>
@@ -29,6 +31,8 @@ export default function TransferListPage() {
             <Table.Td>{transfer.amount}</Table.Td>
             <Table.Td>{transfer.senderId}</Table.Td>
             <Table.Td>{transfer.receiverId}</Table.Td>
+            <Table.Td>{transfer.status}</Table.Td>
+            <Table.Td>{transfer.errorReason}</Table.Td>
           </Table.Tr>
         ))}
       </Table.Tbody>

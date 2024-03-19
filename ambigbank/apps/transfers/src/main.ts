@@ -6,6 +6,8 @@ import { ConfigService } from '@nestjs/config';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {});
 
+  app.enableShutdownHooks();
+
   const swaggerConfig = new DocumentBuilder()
     .setTitle('AM BigBank Transfers Microservice API')
     .setDescription('The BigBank Transfers Microservice API description')

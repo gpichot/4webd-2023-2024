@@ -1,4 +1,9 @@
-import { Module } from '@nestjs/common';
+import {
+  Inject,
+  Module,
+  OnApplicationShutdown,
+  OnModuleInit,
+} from '@nestjs/common';
 
 import { CommonModule } from './services/common.module';
 import { TransfersController } from './transfers.controller';
@@ -10,6 +15,8 @@ import {
   BankAccountService,
   NotificationsService,
   UserService,
+  QueueService,
+  TransferAcknowledgedEvent,
 } from '@ambigbank/services';
 import { AccountsApi } from '@ambigbank/client-bank-accounts';
 
@@ -24,6 +31,17 @@ import { AccountsApi } from '@ambigbank/client-bank-accounts';
   controllers: [TransfersController],
   providers: [
     TransfersService,
+    {
+      provide: QueueService,
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => {
+        return new QueueService(configService.get('services.queue.url'), [
+          configService.get('services.transfers.events.initiatedQueue'),
+          configService.get('services.transfers.events.acknowledgedQueue'),
+          configService.get('services.notifications.queue'),
+        ]);
+      },
+    },
     {
       provide: UserService,
       inject: [ConfigService],
@@ -49,4 +67,35 @@ import { AccountsApi } from '@ambigbank/client-bank-accounts';
     NotificationsService,
   ],
 })
-export class AppModule {}
+export class AppModule implements OnApplicationShutdown, OnModuleInit {
+  @Inject(QueueService)
+  private readonly queueService: QueueService;
+
+  @Inject(ConfigService)
+  private readonly configService: ConfigService;
+
+  @Inject(TransfersService)
+  private readonly transfersService: TransfersService;
+
+  async onModuleInit() {
+    console.log('Connecting to queues');
+    await this.queueService.connect();
+
+    const transferAcknowledgedQueue = this.configService.get(
+      'services.transfers.events.acknowledgedQueue',
+    );
+    this.queueService.receive(
+      transferAcknowledgedQueue,
+      async (message: TransferAcknowledgedEvent) => {
+        console.log('Received transfer acknowledged event', message);
+
+        this.transfersService.completeTransfer(message);
+      },
+    );
+  }
+
+  onApplicationShutdown() {
+    console.log('Closing queues');
+    this.queueService.close();
+  }
+}

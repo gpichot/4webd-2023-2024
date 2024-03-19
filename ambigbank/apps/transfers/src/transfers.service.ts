@@ -1,11 +1,14 @@
 import { BadRequestException, Inject, Injectable } from '@nestjs/common';
-import { Prisma, MoneyTransfer } from 'PrismaClient';
+import { Prisma, MoneyTransfer, TransferStatus } from 'PrismaClient';
 import { PrismaService } from './services/prisma.service';
 import {
-  NotificationsService,
   BankAccountService,
   UserService,
+  QueueService,
+  TransferAcknowledgedEvent,
+  TransferInitiatedEvent,
 } from '@ambigbank/services';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class TransfersService {
@@ -15,11 +18,14 @@ export class TransfersService {
   @Inject(UserService)
   private readonly userService: UserService;
 
+  @Inject(QueueService)
+  private readonly queueService: QueueService;
+
+  @Inject(ConfigService)
+  private readonly configService: ConfigService;
+
   @Inject(BankAccountService)
   private readonly bankAccountService: BankAccountService;
-
-  @Inject(NotificationsService)
-  private readonly notificationsService: NotificationsService;
 
   async createTransfer(data: {
     userId: string;
@@ -29,61 +35,90 @@ export class TransfersService {
   }): Promise<Omit<MoneyTransfer, 'amount'> & { amount: string }> {
     const amount = new Prisma.Decimal(data.amount);
     const { senderId, userId, receiverId } = data;
-    const accountSender =
-      await this.bankAccountService.getBankAccount(senderId);
-
-    if (!accountSender) {
-      throw new BadRequestException('Sender account not found');
-    }
-
-    if (accountSender.userId !== userId) {
-      throw new BadRequestException('Sender account does not belong to user');
-    }
 
     // Check user is not sending to themselves
     if (senderId === receiverId) {
       throw new BadRequestException('Cannot send to yourself');
     }
 
-    if (accountSender.balance < amount) {
-      throw new BadRequestException('Insufficient funds');
-    }
-
-    const responseReceiver = await this.bankAccountService.deposit({
-      accountId: receiverId,
-      amount: amount.toString(),
-    });
-
-    const responseSender = await this.bankAccountService.deposit({
-      accountId: senderId,
-      amount: amount.mul(-1).toString(),
-    });
-
-    if (!responseReceiver || !responseSender) {
-      throw new BadRequestException('Transaction failed');
-    }
-
-    // FIXME: How to handle the transaction failure here?
     const transfer = await this.prisma.moneyTransfer.create({
       data: {
         fromAccountId: senderId,
         toAccountId: receiverId,
         amount,
+        status: TransferStatus.PENDING,
       },
     });
 
-    const sender = await this.userService.getUser(userId);
-    const receiver = await this.userService.getUser(userId);
+    const transferInitiatedQueue = this.configService.get(
+      'services.transfers.events.initiatedQueue',
+    );
+    const payload: TransferInitiatedEvent = {
+      type: 'transfer:initiated',
+      transferId: transfer.id,
+      userId,
+      fromAccountId: senderId,
+      toAccountId: receiverId,
+      amount: amount.toString(),
+    };
 
-    this.notificationsService.sendNotification({
-      type: 'all',
+    console.log(
+      'Sending transfer initiated event',
+      payload,
+      transferInitiatedQueue,
+    );
+    this.queueService.send(transferInitiatedQueue, payload);
+
+    return {
+      ...transfer,
+      amount: transfer.amount.toString(),
+    };
+  }
+
+  async completeTransfer(
+    event: TransferAcknowledgedEvent,
+  ): Promise<Omit<MoneyTransfer, 'amount'> & { amount: string }> {
+    if (!event.ok) {
+      const transfer = await this.prisma.moneyTransfer.update({
+        where: { id: event.transferId },
+
+        data: { status: TransferStatus.FAILED, errorReason: event.reason },
+      });
+
+      return { ...transfer, amount: transfer.amount.toString() };
+    }
+
+    const transfer = await this.prisma.moneyTransfer.findUnique({
+      where: { id: event.transferId },
+    });
+
+    await this.prisma.moneyTransfer.update({
+      where: { id: event.transferId },
+      data: { status: TransferStatus.COMPLETED },
+    });
+    const receiverAccount = await this.bankAccountService.getBankAccount(
+      transfer.toAccountId,
+    );
+    const senderAccount = await this.bankAccountService.getBankAccount(
+      transfer.fromAccountId,
+    );
+
+    const sender = await this.userService.getUser(senderAccount.userId);
+    const receiver = await this.userService.getUser(receiverAccount.userId);
+    const amount = transfer.amount.toString();
+
+    const notificationsQueue = this.configService.get(
+      'services.notifications.queue',
+    );
+    this.queueService.send(notificationsQueue, {
+      type: 'notify:all',
       to: sender,
       title: `${amount}€ sent 💸`,
       message: `You have sent ${amount} to ${receiver.firstName}`,
     });
 
-    this.notificationsService.sendNotification({
-      type: 'all',
+    this.queueService.send(notificationsQueue, {
+      type: 'notify:all',
       to: receiver,
       title: `${amount}€ received 🤑`,
       message: `You have received ${amount} from ${sender.firstName}`,
@@ -91,7 +126,7 @@ export class TransfersService {
 
     return {
       ...transfer,
-      amount: transfer.amount.toString(),
+      amount,
     };
   }
 
@@ -102,6 +137,7 @@ export class TransfersService {
   ): Promise<MoneyTransfer[]> {
     const result = await this.prisma.moneyTransfer.findMany({
       where: params.where,
+      orderBy: { createdAt: 'desc' },
     });
     return result;
   }

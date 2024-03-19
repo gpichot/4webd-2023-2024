@@ -56,6 +56,14 @@ class TransferDto {
   @IsPositive()
   @Expose()
   amount: Prisma.Decimal;
+
+  @ApiProperty()
+  @Expose()
+  status: string;
+
+  @ApiProperty()
+  @Expose()
+  errorReason: string | null;
 }
 
 @ApiTags('transfers')
@@ -90,6 +98,8 @@ export class TransfersController {
           amount: transfer.amount.toString(),
           senderId: transfer.fromAccountId,
           receiverId: transfer.toAccountId,
+          status: transfer.status,
+          errorReason: transfer.errorReason,
         },
         {
           excludeExtraneousValues: true,

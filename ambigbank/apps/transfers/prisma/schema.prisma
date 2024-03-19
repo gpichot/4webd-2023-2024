@@ -15,6 +15,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum TransferStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
 model MoneyTransfer {
   id String @id @default(uuid())
 
@@ -23,4 +29,7 @@ model MoneyTransfer {
 
   fromAccountId String
   toAccountId   String
+
+  status      TransferStatus @default(PENDING)
+  errorReason String?
 }

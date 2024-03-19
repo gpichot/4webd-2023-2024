@@ -84,6 +84,18 @@ export interface TransferDto {
      * @memberof TransferDto
      */
     'amount': object;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransferDto
+     */
+    'status': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TransferDto
+     */
+    'errorReason': string;
 }
 
 /**

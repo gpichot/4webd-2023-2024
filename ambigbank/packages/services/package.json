@@ -14,12 +14,14 @@
   "devDependencies": {
     "@ambigbank/client-bank-accounts": "workspace:*",
     "@ambigbank/client-users": "workspace:*",
+    "@types/amqplib": "^0.10.5",
     "tsup": "^6.7.0",
     "typescript": "^5.3.3"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.0",
+    "amqplib": "^0.10.3",
     "apisauce": "^3.0.1",
     "axios": "^1.6.7"
   }
