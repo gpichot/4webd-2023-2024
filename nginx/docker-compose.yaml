@@ -1,0 +1,23 @@
+version: "3"
+services:
+  app1:
+    image: errm/cheese:cheddar
+    ports:
+      - "5003:80"
+    deploy:
+      mode: replicated
+      replicas: 1
+  app2:
+    image: errm/cheese:stilton
+    ports:
+      - "5002:80"
+    deploy:
+      mode: replicated
+      replicas: 1
+  nginx:
+    build: .
+    ports:
+      - "8080:80"
+    depends_on:
+      - app1
+      - app2
