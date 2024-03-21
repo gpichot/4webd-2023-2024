@@ -13,6 +13,7 @@
       "cache": false,
       "persistent": true
     },
+    "start": { "cache": false },
     "db:migrate:dev": {
       "cache": false,
       "outputs": ["./node_modules/PrismaClient/*"]

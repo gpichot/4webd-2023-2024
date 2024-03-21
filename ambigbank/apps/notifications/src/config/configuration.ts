@@ -4,7 +4,7 @@ export default () => {
     services: {
       queue: {
         url: process.env.QUEUE_URL,
-        queue: process.env.QUEUE_NAME,
+        queue: process.env.NOTIFICATIONS_QUEUE,
       },
     },
   };

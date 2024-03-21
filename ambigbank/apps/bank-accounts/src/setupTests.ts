@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from 'PrismaClient';
 import dotenv from 'dotenv';
 import { expect } from 'vitest';
 
